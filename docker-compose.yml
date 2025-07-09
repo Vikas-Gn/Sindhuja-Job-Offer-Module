@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres-sindhuja
+    ports:
+      - "5053:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: job_applications_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./Backend
+    container_name: backend-sindhuja
+    ports:
+      - "3086:3086"
+    depends_on:
+      - postgres
+    volumes:
+      - ./uploads:/app/uploads
+
+  employee-application:
+    build: ./Employee-application
+    container_name: employee-application
+    ports:
+      - "9042:80"
+    depends_on:
+      - backend
+
+  hr-application:
+    build: ./HR-application
+    container_name: hr-application
+    ports:
+      - "9043:80"
+    depends_on:
+      - backend
+
+  view-offer:
+    build: ./View-offer
+    container_name: view-offer
+    ports:
+      - "9044:80"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
+
